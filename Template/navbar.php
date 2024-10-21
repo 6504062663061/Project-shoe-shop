@@ -1,6 +1,16 @@
 <?php 
   session_start();
+
+  if (isset($_SESSION['username'])) {
+    $stmt = $pdo->prepare("SELECT * FROM shoemember WHERE Username = ?");
+    $stmt->bindParam(1, $_SESSION["username"]);
+    $stmt->execute();
+    $row = $stmt->fetch();
+  }
+
 ?>
+
+
   
 
 <!DOCTYPE html>
@@ -9,14 +19,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChicFoot</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="./css/index.css">
     <script src="/~csb6563061/Project-shoe-shop/script.js"></script>
 </head>
 <body>
 <nav class="navbar" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
-    <a class="navbar-item" href="">
-        <img src="/~csb6563061/Project-shoe-shop/logo.png" alt="Site Logo" style="width: 200px; height: 400px;">
+    <a class="navbar-item" href="/~csb6563061/Project-shoe-shop/index.php">
+        <img src="/~csb6563061/Project-shoe-shop/logonew.png" alt="Site Logo" style="width: 160px; height: 50px;">
 
     </a>
 
@@ -45,45 +56,93 @@
         </a>
 
         <div class="navbar-dropdown">
-            <a class="navbar-item" href="/~csb6563061/Project-shoe-shop/pages/Sneakersshoemain.php">
+            <a class="navbar-item" href="/~csb6563061/Project-shoe-shop/pages/product/Sneakersshoemain.php">
             Sneakers(รองเท้าผ้าใบ)
 
             </a>
-            <a class="navbar-item" href="/~csb6563061/Project-shoe-shop/pages/sportshoemain.php">
+            <a class="navbar-item" href="/~csb6563061/Project-shoe-shop/pages/product/sportshoemain.php">
             Sport (รองเท้ากีฬา)
             </a>
-            <a class="navbar-item " href="/~csb6563061/Project-shoe-shop/pages/Flip-flopsmain.php">
+            <a class="navbar-item " href="/~csb6563061/Project-shoe-shop/pages/product/Flip-flopsmain.php">
             Flip-flops(รองเท้าแตะ)
             </a>
           
         </div>
       </div>
+
+      <?php if(isset($_SESSION["username"])):?>
+        <?php if($row["Status"] == "admin"):?>
+
+          <div class="navbar-item has-dropdown is-hoverable">
+            <a class="navbar-link" href="">
+            Edit
+
+            </a>
+
+            <div class="navbar-dropdown">
+                <a class="navbar-item" href="/~csb6563061/Project-shoe-shop/pages/product/insertP.php">
+                Insert product
+
+                </a>
+                <a class="navbar-item" href="/~csb6563061/Project-shoe-shop/pages/product/editP.php">
+                Edit product
+
+                </a>
+                
+                <a class="navbar-item " href="/~csb6563061/Project-shoe-shop/pages/member/editM.php">
+                Edit member
+                </a>
+                <a class="navbar-item " href="/~csb6563061/Project-shoe-shop/pages/order.php">
+                Orders
+                </a>
+              
+            </div>
+          </div>
+        <?php endif;?>
+      <?php endif;?>
     </div>
 
 
     <div class="navbar-end">
       <div class="navbar-item">
         
-        <?php if (isset($_SESSION["username"])): ?>
-            <?php
-            $stmt = $pdo->prepare("SELECT * FROM shoemember WHERE Username = ?");
-            $stmt->bindParam(1, $_SESSION["username"]);
-            $stmt->execute();
-            $row = $stmt->fetch();
+      <?php if (isset($_SESSION["username"])): ?>
 
-            $image_extensions = ['jpg', 'jpeg', 'png'];
-                foreach ($image_extensions as $ext) {
-                    if (file_exists("/~csb6563061/Project-shoe-shop/memphoto/{$row['Username']}.$ext")) {
-                        echo "<a><img src='/~csb6563061/Project-shoe-shop/memphoto/{$row['Username']}.$ext' width='50'></a>";
-                        break;
-                    }
-                }
+        <a class="navbar-item" href="/~csb6563061/Project-shoe-shop/pages/Favorites.php">
+          <i class="fas fa-heart"></i>
 
-                
+        </a>
+        <a class="navbar-item" href="/~csb6563061/Project-shoe-shop/pages/cart.php">
+          <i class="fas fa-shopping-cart"></i>
+        </a>
+
+        <div class="navbar-item has-dropdown is-hoverable">
+            <a class="navbar-link" href="">
+             
+              
+              <i class="fas fa-user"></i>
+              <span><?= htmlspecialchars($row["Username"]) ?></span>    
+              
+
+            </a>
             
-            ?>
-
-        <?php else: ?>
+              
+            <div class="navbar-dropdown">
+            
+              <a class="navbar-item" href="/~csb6563061/Project-shoe-shop/pages/profile.php">
+                Profile
+              </a>
+              
+              <a class="navbar-item" href="/~csb6563061/Project-shoe-shop/pages/logout.php">
+                Logout
+  
+              </a>
+                    
+            </div>
+        </div>
+            
+      </div>
+      <?php else: ?>
             <div class="buttons">
             <a class="button is-primary" href="">
                 <strong>Sign up</strong>
@@ -93,7 +152,7 @@
             </a>
             </div>
 
-        <?php endif; ?>
+      <?php endif; ?>
       </div>
     </div>
 
@@ -105,3 +164,16 @@
 </body>
 
 </html>
+
+                  
+
+                    
+                  
+           
+            
+                    
+                  
+            
+            
+                    
+                  

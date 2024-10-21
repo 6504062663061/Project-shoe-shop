@@ -3,9 +3,9 @@
   
   session_start();
 
-  $stmt = $pdo->prepare("SELECT * FROM shoemember WHERE Username = ? AND password = ?");
-  $stmt->bindParam(1, $_POST["username"]);
-  $stmt->bindParam(2, $_POST["password"]);
+  $stmt = $pdo->prepare("SELECT * FROM shoemember WHERE Username = ? AND Password = ?");
+  $stmt->bindParam(1, $_POST["Username"]);
+  $stmt->bindParam(2, $_POST["Password"]);
   $stmt->execute();
   $row = $stmt->fetch();
 
@@ -23,6 +23,6 @@
   
   } else {
     echo "ไม่สำเร็จ ชื่อหรือรหัสผ่านไม่ถูกต้อง";
-    echo "<a href='login-form.php'>เข้าสู่ระบบอีกครัง</a>"; 
+    echo "<a href='loginform.php'>เข้าสู่ระบบอีกครัง</a>"; 
   }
 ?>

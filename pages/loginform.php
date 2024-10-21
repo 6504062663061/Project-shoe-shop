@@ -12,11 +12,11 @@
   <body>
     <div class="login-container">
             <div class="logo">
-                <img src="../logo.png" alt="Site Logo">
+                <img src="../logonew.png" alt="Site Logo">
             </div>
             <form action="check-login.php" method="POST">
-                <input type="text" name="username" placeholder="Username" required>
-                <input type="password" name="password" placeholder="Password" required>
+                <input type="text" name="Username" placeholder="Username" required>
+                <input type="password" name="Password" placeholder="Password" required>
                 <input type="submit" value="Login">
             </form>
             
