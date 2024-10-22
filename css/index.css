@@ -67,3 +67,22 @@ footer {
   margin: 0;
   color: #aaa;
 }
+
+.dropdown-search-content {
+  position: absolute;
+  background-color: white;
+  min-width: 200px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.dropdown-search-item {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.dropdown-search-item:hover {
+  background-color: #f1f1f1;
+}

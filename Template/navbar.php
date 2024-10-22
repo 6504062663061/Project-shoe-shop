@@ -21,7 +21,59 @@
     <title>ChicFoot</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="./css/index.css">
-    <script src="/~csb6563061/Project-shoe-shop/script.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+
+      // Get all "navbar-burger" elements
+      const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+      // Add a click event on each of them
+      $navbarBurgers.forEach( el => {
+        el.addEventListener('click', () => {
+
+          // Get the target from the "data-target" attribute
+          const target = el.dataset.target;
+          const $target = document.getElementById(target);
+
+          // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+          el.classList.toggle('is-active');
+          $target.classList.toggle('is-active');
+
+        });
+      });
+
+      });
+
+
+      function searchShoes(query) {
+      var dropdown = document.getElementById("searchDropdown");
+
+      if (query.length == 0) {
+          dropdown.style.display = "none"; // Hide the dropdown if input is empty
+          return;
+      }
+
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+              var response = this.responseText.trim();
+              if (response) {
+                  dropdown.innerHTML = response; 
+                  dropdown.style.display = "block"; // Show the dropdown if results are found
+              } else {
+                  dropdown.style.display = "none"; // Hide the dropdown if no results
+              }
+          }
+      };
+
+      xhr.open("GET", "/~csb6563061/Project-shoe-shop/pages/searchShoes.php?query=" + encodeURIComponent(query), true);
+      xhr.send();
+      }
+
+      function goToShoeDetail(shoeId) {
+      window.location.href = "/~csb6563061/Project-shoe-shop/pages/pages/shoedetail.php?Shoes_ID=" + shoeId;
+      }
+    </script>
 </head>
 <body>
 <nav class="navbar" role="navigation" aria-label="main navigation">
@@ -105,6 +157,16 @@
 
     <div class="navbar-end">
       <div class="navbar-item">
+
+      <div class="navbar-item search">
+        <form id="searchForm" onsubmit="return false;">
+          <input type="text" id="searchBar" placeholder="search products" onkeyup="searchShoes(this.value)">
+        </form>
+        <div id="searchDropdown" class="dropdown-search-content" style="display: none;">
+          
+        </div>
+      </div>
+      
         
       <?php if (isset($_SESSION["username"])): ?>
 
@@ -160,6 +222,8 @@
 
   </div>
 </nav>
+
+
     
 </body>
 
