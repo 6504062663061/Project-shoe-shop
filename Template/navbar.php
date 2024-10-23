@@ -20,7 +20,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChicFoot</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="./css/index.css">
+    <link rel="stylesheet" href="/~csb6563061/Project-shoe-shop/css/index.css">
     <script>
       document.addEventListener('DOMContentLoaded', () => {
 
@@ -108,6 +108,10 @@
         </a>
 
         <div class="navbar-dropdown">
+          <a class="navbar-item" href="/~csb6563061/Project-shoe-shop/pages/product/allshoe.php">
+            รองเท้าทั้งหมด
+
+            </a>
             <a class="navbar-item" href="/~csb6563061/Project-shoe-shop/pages/product/Sneakersshoemain.php">
             Sneakers(รองเท้าผ้าใบ)
 

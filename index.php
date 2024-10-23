@@ -62,7 +62,7 @@ include './Template/header.php';
             <div class="card">
                 <div class="card-image">
                     <figure class="image is-4by3">
-                        <a href="./pages/shoedetail.php?Shoes_ID=<?=$row["Shoes_ID"]?>">
+                        <a href="./pages/product/shoedetail.php?Shoes_ID=<?=$row["Shoes_ID"]?>">
                             <img src='./sphoto/<?=$row["Shoes_ID"]?>' width='100'>
                         </a>
                     </figure>
