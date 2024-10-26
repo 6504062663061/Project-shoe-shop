@@ -1,4 +1,4 @@
-<?php Include "../connect.php";?>
+<?php include "../connect.php"; ?>
 
 <!DOCTYPE html>
 <html>
@@ -7,118 +7,172 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ChicFoot</title>
     <link rel="stylesheet" href="../css/index.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        .bodycart {
+            background-color: #f7f8fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        .cart-container {
+            max-width: 600px;
+            width: 100%;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h2 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            color: #555;
+            font-weight: bold;
+        }
+        td {
+            color: #333;
+            border-top: 1px solid #ddd;
+        }
+        .cart-item-quantity input[type="number"] {
+            width: 50px;
+            padding: 5px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .cart-item-actions a {
+            color: #3498db;
+            font-size: 14px;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+        .cart-item-actions a:hover {
+            color: #1d6fa5;
+        }
+        .cart-total {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 15px;
+        }
+        .message {
+            text-align: center;
+            margin-bottom: 10px;
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
   </head>
-  <?php
-  include '../Template/navbar.php';
-  
-  ?>
+ 
   <body>
-    <div>
-    <?php
-                
-                session_start();
+    <?php include '../Template/navbar.php'; ?>
+    <div class="bodycart">
+        <div class="cart-container">
+            <h2>Shopping Cart</h2>
 
-                
-	
-                
-		
-
-                
-
-                // เพิ่มสินค้า
-                if ($_GET["action"] == "add") {
-
-                    $pid = $_GET['Shoes_ID'];
-
-                    // ตรวจสอบจำนวนสินค้าคงเหลือ
-                    $stmt = $pdo->prepare("SELECT stock FROM Shoes WHERE Shoes_ID = :Shoes_ID");
-                    $stmt->execute(['Shoes_ID' => $pid]);
-                    $product = $stmt->fetch();
-                    $stock = $product['stock'];
-
-                    $qty = $_POST['qty'];
-
-                    $cart_item = array(
-                        'pid' => $pid,
-                        'pname' => $_GET['name'],
-                        'price' => $_GET['price'],
-                        'qty' => $_POST['qty']
-                    );
-
-                    // ถ้ายังไม่มีสินค้าในรถเข็น
-                    if (empty($_SESSION['cart'])) {
-                        $_SESSION['cart'] = array();
-                    }
-
-                    // ถ้ามีสินค้านั้นอยู่แล้วในรถเข็นให้บวกเพิ่ม
-                    if (array_key_exists($pid, $_SESSION['cart'])) {
-                        $_SESSION['cart'][$pid]['qty'] += $_POST['qty'];
-
-                        // ตรวจสอบจำนวนสินค้าที่เลือกหลังเพิ่ม
-                        if ($_SESSION['cart'][$pid]['qty'] > $stock) {
-                            echo "จำนวนสินค้าที่เลือกมากกว่าสินค้าคงเหลือ!";
-                            exit();
-                        }
-                    } else {
-                        $_SESSION['cart'][$pid] = $cart_item;
-                    }
-                }
-
-                // ปรับปรุงจำนวนสินค้า
-                else if ($_GET["action"] == "update") {
-                    $pid = $_GET["Shoes_ID"];
-                    $qty = $_GET["qty"];
-
-                    // ตรวจสอบสินค้าคงเหลือก่อนอัปเดต
-                    $stmt = $pdo->prepare("SELECT stock FROM Shoes WHERE Shoes_ID = :Shoes_ID");
-                    $stmt->execute(['Shoes_ID' => $pid]);
-                    $product = $stmt->fetch();
-                    $stock = $product['stock'];
-
-                    if ($qty > $stock) {
-                        echo "จำนวนที่เลือกมากกว่าสินค้าคงเหลือ!";
-                        exit();
-                    }
-
-                    $_SESSION['cart'][$pid]['qty'] = $qty;
-                }
-
-                // ลบสินค้า
-                else if ($_GET["action"] == "delete") {
-                    $pid = $_GET['Shoes_ID'];
-                    unset($_SESSION['cart'][$pid]);
-                }
-                ?>
-                <form>
-            <table border="1">
             <?php
-                $sum = 0;
-                foreach ($_SESSION["cart"] as $item) {
-                    $sum += $item["price"] * $item["qty"];
+            session_start();
 
-                    // ดึงข้อมูลสต็อกสินค้าปัจจุบัน
+            $message = "";  // To store feedback messages
+
+            // Check for action
+            if (isset($_GET["action"])) {
+                $pid = $_GET['Shoes_ID'] ;
+                $qty = isset($_POST['qty']) ? (int)$_POST['qty'] : 0;
+
+                if ($pid) {
+                    // Fetch stock of selected item
                     $stmt = $pdo->prepare("SELECT stock FROM Shoes WHERE Shoes_ID = :Shoes_ID");
-                    $stmt->execute(['Shoes_ID' => $item['Shoes_ID']]);
+                    $stmt->execute(['Shoes_ID' => $pid]);
                     $product = $stmt->fetch();
-                    $stock = $product['stock'];
+                    $stock = $product['stock'] ?? 0;
+
+                    if ($_GET["action"] == "add") {
+                        if ($qty > 0 && $qty <= $stock) {
+                            $_SESSION['cart'][$pid]['qty'] += $qty;
+                            $message = "<p class='message success'>Item added to cart.</p>";
+                        } else {
+                            $message = "<p class='message'>Invalid quantity or exceeds stock!</p>";
+                        }
+                    } elseif ($_GET["action"] == "update") {
+                        if ($qty <= $stock) {
+                            $_SESSION['cart'][$pid]['qty'] = $qty;
+                            $message = "<p class='message success'>Quantity updated.</p>";
+                        } else {
+                            $message = "<p class='message'>Exceeds stock limit!</p>";
+                        }
+                    } elseif ($_GET["action"] == "delete") {
+                        unset($_SESSION['cart'][$pid]);
+                        $message = "<p class='message success'>Item removed from cart.</p>";
+                    }
+                }
+            }
+            
+            echo $message;  // Display any messages
+
+            if (!empty($_SESSION["cart"])) {
+                $sum = 0;
+                ?>
+                <table border="1">
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Actions</th>
+                    </tr>
+                    <?php
+                    foreach ($_SESSION["cart"] as $item) {
+                        $sum += $item["price"] * $item["qty"];
+                        ?>
+                        <tr class="cart-item">
+                            <td><?= htmlspecialchars($item["name"]) ?></td>
+                            <td><?= htmlspecialchars($item["price"]) ?> ฿</td>
+                            <td>
+                                <form method="post" action="?action=update&Shoes_ID=<?= htmlspecialchars($item["pid"]) ?>">
+                                    <input type="number" name="qty" value="<?= htmlspecialchars($item["qty"]) ?>" min="1" max="<?= htmlspecialchars($stock) ?>">
+                                    <button type="submit">Update</button>
+                                </form>
+                            </td>
+                            <td>
+                                <a href="?action=delete&Shoes_ID=<?= htmlspecialchars($item["pid"]) ?>">Delete</a>
+                            </td>
+                        </tr>
+                        <?php
+                    }
+                    ?>
+                    <tr>
+                        <td colspan="4" align="right" class="cart-total">Total: <?= $sum ?> บาท</td>
+                    </tr>
+                </table>
+                <?php
+            } else {
+                echo "<p>Your cart is empty!</p>";
+            }
             ?>
-                <tr>
-                    <td><?= htmlspecialchars($item["name"]) ?></td>
-                    <td><?= htmlspecialchars($item["price"]) ?> บาท</td>
-                    <td>
-                        <!-- จำกัดจำนวนสูงสุดเท่ากับจำนวนสินค้าคงเหลือ -->
-                        <input type="number" id="<?= htmlspecialchars($item["Shoes_ID"]) ?>" value="<?= htmlspecialchars($item["qty"]) ?>" min="1" max="<?= htmlspecialchars($stock) ?>">
-                        <a href="#" onclick="update(<?= htmlspecialchars($item["Shoes_ID"]) ?>)">แก้ไข</a>
-                        <a href="?action=delete&pid=<?= htmlspecialchars($item["Shoes_ID"]) ?>">ลบ</a>
-                    </td>
-                </tr>
-            <?php } ?>
-            <tr><td colspan="3" align="right">รวม <?= $sum ?> บาท</td></tr>
-            </table>
-            </form>
+        </div>
     </div>
-  
-  
+    <?php include '../Template/footer.php'; ?>
   </body>
-  <?php include '../Template/footer.php'; ?>
 </html>

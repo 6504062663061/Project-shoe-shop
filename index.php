@@ -30,15 +30,15 @@ include './Template/header.php';
         <br>
     </div>
     <div>
-        <!-- display 4 best seller -->
-    <div class="columns is-multiline is-gapless">
+        <!-- display best seller -->
+    <div class="columns is-multiline is-2">
         <?php
             $stmt = $pdo->prepare("SELECT p.*, SUM(i.quantity) as total_sold
                                             FROM shoeitem i
                                             JOIN Shoes p ON i.Shoes_ID = p.Shoes_ID
                                             GROUP BY i.Shoes_ID
                                             ORDER BY total_sold DESC
-                                            LIMIT 4");
+                                            LIMIT 6");
             $stmt->execute();
 
             $extensions = ['jpg','png','jpeg'];
@@ -63,7 +63,7 @@ include './Template/header.php';
                 <div class="card-image">
                     <figure class="image is-4by3">
                         <a href="./pages/product/shoedetail.php?Shoes_ID=<?=$row["Shoes_ID"]?>">
-                            <img src='./sphoto/<?=$row["Shoes_ID"]?>' width='100'>
+                            <img src="<?=$imagePath?>" width='100'>
                         </a>
                     </figure>
                 </div>

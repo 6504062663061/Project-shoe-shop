@@ -1,7 +1,7 @@
 <?php Include "../../connect.php"; ?>
 
 <?php
-    $stmt = $pdo->prepare("SELECT * FROM Shoes");
+    $stmt = $pdo->prepare("SELECT * FROM Shoes WHERE type ='slipper'");
     $stmt->execute();
 
     $extensions = ['jpg','png','jpeg'];
@@ -15,9 +15,10 @@
         }
     }
     if($imagePath == ''){
-        $imagePath = "../pphoto/default-image.jpg";
+        $imagePath = "../../pphoto/default-image.jpg";
     }
 ?>
+    
     <div style="
         border: 1px solid #ddd;
         border-radius: 12px;
@@ -35,4 +36,5 @@
         <p style="font-size: 14px; color: #666; margin: 0 0 10px;"><?=$row["title"]?></p>
         <p class="title" style="font-size: 16px; color: #e74c3c; font-weight: 600;"><?=$row["price"]?> บาท</p>
     </div>
+    
 <?php endwhile; ?>

@@ -41,22 +41,27 @@
             <div class="columns ">
 
                 <div style="margin: 15px;" class="product column is-half">
-                     <a href="shoedetail.php?Shoes_ID=<?=$row["Shoes_ID"]?>">
-                         <img src='../../sphoto/<?=$imagePath?>' width='1000'>
-                     </a><br>
+                     
+                    <img src='<?=$imagePath?>' width='1000'>
+                     <br>
                      
                 </div>
                 <section class="section is-large column is-half">
                     <h1 class="title"><?=$row["name"]?></h1><br>
                     <h2 class="subtitle"><?=$row["title"]?></h2><br>
                     <h2><?=$row["price"]?><span> บาท</span></h2><br>
-                    <form method="post" action="../cart.php?action=add&Shoes_ID=<?=$row["Shoes_ID"]?>&pname=<?=$row["name"]?>&price=<?=$row["price"]?>">
-                        <input type="number" name="qty" value="1" min="1" max="9">
-                        <input class="button is-success" type="submit" value="Add to Cart">	   
-                    </form>
+                    <?php if (!isset($_SESSION['username'])):?>
+                        <br>
+                        <h5 style="color: red;">กรุณาเข้าสู่ระบบเพื่อซื้อสินค้า</h5>
+                    <?php else:?>
+                        <form method="post" action="../cart.php?action=add&Shoes_ID=<?=$row["Shoes_ID"]?>&pname=<?=$row["name"]?>&price=<?=$row["price"]?>">
+                            <input type="number" name="qty" value="1" min="1" max="<?=$row["stock"]?>">
+                            <input class="button is-success" type="submit" value="Add to Cart">	   
+                        </form>
+                    <?php endif;?>
                 </section>
                     
-
+                
 
                 
                     
