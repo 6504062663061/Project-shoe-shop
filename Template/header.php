@@ -21,7 +21,6 @@
             font-size: 3em;
             text-align: center;
             margin: 0;
-            color: #fff; /* ตั้งค่าตัวอักษรสีขาว */
             font-weight: bold;
         }
 
