@@ -147,7 +147,7 @@
                         $sum += $item["price"] * $item["qty"];
                         ?>
                         <tr class="cart-item">
-                            <td><?= htmlspecialchars($item["name"]) ?></td>
+                            <td><?= htmlspecialchars($item["pname"]) ?></td>
                             <td><?= htmlspecialchars($item["price"]) ?> ฿</td>
                             <td>
                                 <form method="post" action="?action=update&Shoes_ID=<?= htmlspecialchars($item["pid"]) ?>">

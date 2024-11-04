@@ -10,8 +10,8 @@
 <section class="hero is-success is-halfheight">
   <div class="hero-body">
     <div class="">
-      <p class="title">Half height hero</p>
-      <p class="subtitle">Half height subtitle</p>
+      <p class="title">CHICFOOT</p>
+      <p class="subtitle">Best Shoes shop website in the world</p>
     </div>
   </div>
 </section>

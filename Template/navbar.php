@@ -181,6 +181,9 @@
         <a class="navbar-item" href="/~csb6563061/Project-shoe-shop/pages/cart.php">
           <i class="fas fa-shopping-cart"></i>
         </a>
+        <a class="navbar-item" href="/~csb6563061/Project-shoe-shop/pages/history.php">
+          <i class="fa fa-repeat"></i>
+        </a>
 
         <div class="navbar-item has-dropdown is-hoverable">
             <a class="navbar-link" href="">

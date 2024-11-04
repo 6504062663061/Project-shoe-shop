@@ -3,7 +3,7 @@
         <div class="footer-column">
             <h3>Customer Services</h3>
             <ul>
-                <li><a href="#">Contact</a></li>
+                <li><a href="/~csb6563061/Project-shoe-shop/pages/contact.php">Contact</a></li>
                 <li><a href="#">Terms and Conditions</a></li>
                 
             </ul>
