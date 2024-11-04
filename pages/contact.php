@@ -1,4 +1,32 @@
-<?php include "../connect.php"; ?>
+<?php 
+include "../connect.php"; 
+
+// Check if form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Collect form data
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $message = $_POST['message'];
+
+    // Insert data into the database using PDO
+    try {
+        $stmt = $pdo->prepare("INSERT INTO contacts (name, email, phone, message) VALUES (:name, :email, :phone, :message)");
+        $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':phone', $phone);
+        $stmt->bindParam(':message', $message);
+
+        if ($stmt->execute()) {
+            $alert = "Thank you for contacting us! Your message has been saved.";
+        } else {
+            $alert = "Oops! Something went wrong, and we couldn't save your message.";
+        }
+    } catch (PDOException $e) {
+        $alert = "Database error: " . $e->getMessage();
+    }
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -115,7 +143,13 @@
 
     <div class="contact-form-container">
         <h2>Send us a Message</h2>
-        <form class="contact-form" action="contact.php" method="post">
+        
+        <!-- Display alert if set -->
+        <?php if (isset($alert)) : ?>
+            <p style="color: green;"><?= $alert; ?></p>
+        <?php endif; ?>
+        
+        <form class="contact-form" action="" method="post">
             <div class="input-group">
                 <i class="fas fa-user"></i>
                 <input type="text" name="name" placeholder="Enter your name" required>
