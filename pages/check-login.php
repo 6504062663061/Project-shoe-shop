@@ -8,12 +8,17 @@ $stmt->bindParam(2, $_POST["Password"]);
 $stmt->execute();
 $row = $stmt->fetch();
 
+
 if (!empty($row)) { 
-    $_SESSION["fullname"] = $row["Name"];   
-    $_SESSION["username"] = $row["Username"];
-    $_SESSION["usertype"] = $row["Status"];
-    header("Location: ../index.php"); 
-    exit();
+    
+        session_start();
+        $_SESSION["fullname"] = $row["Name"];
+        $_SESSION["username"] = $row["Username"];
+        $_SESSION["usertype"] = $row["Status"];
+
+        header("Location: ./profile.php");
+        exit();
+    
 } else {
     echo '
     <!DOCTYPE html>

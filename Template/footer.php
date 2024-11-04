@@ -20,9 +20,9 @@
         <div class="footer-column">
             <h3>CATEGORIES</h3>
             <ul>
-                <li><a href="/~csb6563061/Project-shoe-shop/pages/Sneakersshoemain.php">Sneaker</a></li>
-                <li><a href="/~csb6563061/Project-shoe-shop/pages/sportshoemain.php">Sport</a></li>
-                <li><a href="/~csb6563061/Project-shoe-shop/pages/Flip-flopsmain.php">Flip-flops</a></li>
+                <li><a href="/~csb6563061/Project-shoe-shop/pages/product/Sneakersshoemain.php">Sneaker</a></li>
+                <li><a href="/~csb6563061/Project-shoe-shop/pages/product/sportshoemain.php">Sport</a></li>
+                <li><a href="/~csb6563061/Project-shoe-shop/pages/product/Flip-flopsmain.php">Flip-flops</a></li>
                 
             </ul>
         </div>

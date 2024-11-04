@@ -1,4 +1,4 @@
-<?php Include "../../connect.php"; ?>
+<?php include "../../connect.php"; ?>
 
 <!DOCTYPE html>
 <html>
@@ -46,14 +46,14 @@
         function clearFilters() {
             document.getElementById("min_price").value = '';
             document.getElementById("max_price").value = '';
-            document.getElementById("color").selectedIndex = 0; // Select first option (All Colors)
-            showAllProducts(); // Show all products again
+            document.getElementById("color").selectedIndex = 0;
+            showAllProducts();
         }
 
         function showAllProducts() {
             var shoeResults = document.getElementById("shoeResults");
             shoeResults.innerHTML = ''; 
-            loadAllProducts(); // Load all products
+            loadProducts(); 
         }
 
         function loadProducts() {
@@ -62,7 +62,7 @@
 
             xmlHttp.onreadystatechange = function() {
                 if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-                    shoeResults.innerHTML = xmlHttp.responseText; // Load all products
+                    shoeResults.innerHTML = xmlHttp.responseText;
                 }
             };
 
@@ -88,26 +88,24 @@ include '../../Template/navbar.php';
 ?>
 
 <body>
-    <div  class="fixed-grid">
-        <div  class="grid">
+    <div class="fixed-grid">
+        <div class="grid">
             <form id="filterForm" class="cell">
                 
                 <label for="category">Category:</label>
                 <select name="category" id="category" onchange="redirectToCategory()">
-                    <option value="all" >All Categories</option>
+                    <option value="all">All Categories</option>
                     <option value="Sneakers" selected>Sneakers</option>
-                    <option value="Sport Shoes" >Sport Shoes</option>
+                    <option value="Sport Shoes">Sport Shoes</option>
                     <option value="Slippers">Slippers</option>
                 </select>
 
-              
                 <label for="min_price">Min Price:</label>
                 <input type="number" name="min_price" id="min_price" placeholder="0" min="0">
 
                 <label for="max_price">Max Price:</label>
                 <input type="number" name="max_price" id="max_price" placeholder="10000" min="0">
 
-                
                 <label for="color">Color:</label>
                 <select name="color" id="color">
                     <option value="">All Colors</option>
@@ -120,14 +118,11 @@ include '../../Template/navbar.php';
                     <option value="Purple">Purple</option>
                 </select>
                 
-                
                 <button type="button" onclick="clearFilters()">Clear Filters</button>
             </form>
         </div>
 
-        
         <div id="shoeResults" class="cell columns is-multiline is-2">
-            
         </div>
     </div>
 </body>

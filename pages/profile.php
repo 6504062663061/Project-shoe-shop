@@ -89,7 +89,7 @@
             }
         }
         if($imagePath == ''){
-            $imagePath = " ";
+            $imagePath = "../memphoto/default.jpg";
         }
         ?>
 
@@ -97,6 +97,8 @@
       <div class="profile-name"><?= htmlspecialchars($user['Name']); ?></div>
       <div class="profile-info">Email: <?= htmlspecialchars($user['Email']); ?></div>
       <div class="profile-info">Phone: <?= htmlspecialchars($user['Phone']); ?></div>
+      <div class="profile-info">Address</div>
+      <div class="profile-info"><?= htmlspecialchars($user['Address']); ?></div>
 
       
       <a href="edit_profile.php" class="edit-btn">Edit Profile</a>

@@ -1,20 +1,20 @@
-<?php Include "../../connect.php"; ?>
+<?php include "../../connect.php"; ?>
 
 <?php
-    $stmt = $pdo->prepare("SELECT * FROM Shoes");
+    $stmt = $pdo->prepare("SELECT * FROM shoes");  // ใช้ชื่อตารางตัวเล็กตามที่ระบุ
     $stmt->execute();
 
-    $extensions = ['jpg','png','jpeg'];
+    $extensions = ['jpg', 'png', 'jpeg'];
 ?>  
 <?php while ($row = $stmt->fetch()) : 
     $imagePath = '';
-    foreach ($extensions as $ext){
-        if(file_exists("../../sphoto/{$row['Shoes_ID']}.$ext")){
+    foreach ($extensions as $ext) {
+        if (file_exists("../../sphoto/{$row['Shoes_ID']}.$ext")) {
             $imagePath = "../../sphoto/{$row['Shoes_ID']}.$ext";
             break;
         }
     }
-    if($imagePath == ''){
+    if ($imagePath == '') {
         $imagePath = "../pphoto/default-image.jpg";
     }
 ?>

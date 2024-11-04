@@ -14,11 +14,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $email = $_POST['email'];
     $phone = $_POST['phone'];
+    $address = $_POST['address'];
 
-    $updateStmt = $pdo->prepare("UPDATE shoemember SET Name = :name, Email = :email, Phone = :phone WHERE Username = :username");
+    $updateStmt = $pdo->prepare("UPDATE shoemember SET Name = :name, Email = :email, Phone = :phone, Address = :address WHERE Username = :username");
     $updateStmt->bindParam(':name', $name);
     $updateStmt->bindParam(':email', $email);
     $updateStmt->bindParam(':phone', $phone);
+    $updateStmt->bindParam(':address', $address);
     $updateStmt->bindParam(':username', $_SESSION['username']);
     $updateStmt->execute();
 
@@ -64,6 +66,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         border: 1px solid #ccc;
         border-radius: 5px;
       }
+
+      textarea{
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
       .save-btn {
         width: 100%;
         padding: 10px;
@@ -94,7 +103,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <label for="phone">Phone:</label>
             <input type="tel" id="phone" name="phone" value="<?=$user['Phone']?>">
-
+            
+            <label for="address">Address:</label>
+            <textarea name="address" id="address" placeholder="Write your address" required><?=htmlspecialchars($user['Address'])?></textarea>
+            
             <button type="submit" class="save-btn">Save Changes</button>
         </form>
     </div>

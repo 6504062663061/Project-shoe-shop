@@ -1,24 +1,23 @@
-<?php Include "../../connect.php"; ?>
+<?php include "../../connect.php"; ?>
 
 <?php
-    $stmt = $pdo->prepare("SELECT * FROM Shoes WHERE type ='sneakers'");
+    $stmt = $pdo->prepare("SELECT * FROM shoes WHERE type = 'sneakers'");  // ใช้ชื่อตารางตัวเล็กตามที่ระบุ
     $stmt->execute();
 
-    $extensions = ['jpg','png','jpeg'];
+    $extensions = ['jpg', 'png', 'jpeg'];
 ?>  
 <?php while ($row = $stmt->fetch()) : 
     $imagePath = '';
-    foreach ($extensions as $ext){
-        if(file_exists("../../sphoto/{$row['Shoes_ID']}.$ext")){
+    foreach ($extensions as $ext) {
+        if (file_exists("../../sphoto/{$row['Shoes_ID']}.$ext")) {
             $imagePath = "../../sphoto/{$row['Shoes_ID']}.$ext";
             break;
         }
     }
-    if($imagePath == ''){
+    if ($imagePath == '') {
         $imagePath = "../../pphoto/default-image.jpg";
     }
 ?>
-    
     <div style="
         border: 1px solid #ddd;
         border-radius: 12px;
@@ -36,5 +35,4 @@
         <p style="font-size: 14px; color: #666; margin: 0 0 10px;"><?=$row["title"]?></p>
         <p class="title" style="font-size: 16px; color: #e74c3c; font-weight: 600;"><?=$row["price"]?> บาท</p>
     </div>
-    
 <?php endwhile; ?>

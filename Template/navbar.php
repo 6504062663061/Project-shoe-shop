@@ -213,7 +213,7 @@
       </div>
       <?php else: ?>
             <div class="buttons">
-            <a class="button is-primary" href="">
+            <a class="button is-primary" href="/~csb6563061/Project-shoe-shop/pages/registerform.php">
                 <strong>Sign up</strong>
             </a>
             <a class="button is-light" href="/~csb6563061/Project-shoe-shop/pages/loginform.php">

@@ -1,10 +1,10 @@
 <?php
 include '../../connect.php';
 
-
 $params = [];
-$query = "SELECT * FROM Shoes"; 
+$query = "SELECT * FROM shoes"; // ใช้ชื่อ 'shoes' ตัวเล็ก
 
+// Filter by minimum price
 if (isset($_GET['min_price']) && is_numeric($_GET['min_price'])) {
     $min_price = $_GET['min_price'];
     if (strpos($query, 'WHERE') === false) {
@@ -15,6 +15,7 @@ if (isset($_GET['min_price']) && is_numeric($_GET['min_price'])) {
     $params[':min_price'] = $min_price;
 }
 
+// Filter by maximum price
 if (isset($_GET['max_price']) && is_numeric($_GET['max_price'])) {
     $max_price = $_GET['max_price'];
     if (strpos($query, 'WHERE') === false) {
@@ -25,29 +26,25 @@ if (isset($_GET['max_price']) && is_numeric($_GET['max_price'])) {
     $params[':max_price'] = $max_price;
 }
 
-// Handle color filter
+// Filter by color within stock_data JSON field
 if (isset($_GET['color']) && !empty($_GET['color'])) {
     $color = $_GET['color'];
     if (strpos($query, 'WHERE') === false) {
-        $query .= " WHERE color = :color"; 
+        $query .= " WHERE JSON_CONTAINS(stock_data, JSON_OBJECT('color', :color), '$')"; 
     } else {
-        $query .= " AND color = :color"; 
+        $query .= " AND JSON_CONTAINS(stock_data, JSON_OBJECT('color', :color), '$')"; 
     }
     $params[':color'] = $color;
 }
 
-
 $stmt = $pdo->prepare($query);
 
-
+// Bind parameters
 foreach ($params as $key => $value) {
     $stmt->bindValue($key, $value);
 }
 
-
 $stmt->execute();
-
-
 $shoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $extensions = ['jpg','png','jpeg'];
@@ -55,7 +52,7 @@ $extensions = ['jpg','png','jpeg'];
 <?php if (!empty($shoes)) : ?>
     <?php foreach ($shoes as $shoe) : 
         $imagePath = '';
-        foreach ($extensions as $ext){
+        foreach ($extensions as $ext) {
             if(file_exists("../../sphoto/{$shoe['Shoes_ID']}.$ext")){
                 $imagePath = "../../sphoto/{$shoe['Shoes_ID']}.$ext";
                 break;

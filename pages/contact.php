@@ -110,7 +110,7 @@
 </head>
 <body>
 
-    <!-- Include Navbar -->
+    
     <?php include '../Template/navbar.php'; ?>
 
     <div class="contact-form-container">
@@ -136,7 +136,7 @@
         </form>
     </div>
 
-    <!-- Include Footer -->
+    
     <?php include '../Template/footer.php'; ?>
 
 </body>

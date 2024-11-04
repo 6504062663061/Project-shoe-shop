@@ -1,4 +1,4 @@
-<?php Include "../../connect.php"; ?>
+<?php include "../../connect.php"; ?>
 
 <!DOCTYPE html>
 <html>
@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="../../css/index.css">
     
     <style>
-        /* General styles for buttons */
         .button {
             padding: 10px 15px;
             border: none;
@@ -19,24 +18,22 @@
             color: white;
         }
 
-        /* Specific button styles */
         .is-success {
-            background-color: #28a745; /* Green for Add to Cart */
+            background-color: #28a745;
         }
 
         .is-success:hover {
-            background-color: #218838; /* Darker green on hover */
+            background-color: #218838;
         }
 
         .is-info {
-            background-color: #17a2b8; /* Blue for Add to Favorites */
+            background-color: #17a2b8;
         }
 
         .is-info:hover {
-            background-color: #138496; /* Darker blue on hover */
+            background-color: #138496;
         }
 
-        /* Input styles for quantity */
         .qty-input {
             width: 60px;
             padding: 5px;
@@ -45,12 +42,11 @@
             border-radius: 5px;
         }
 
-        /* Button container styles */
         .button-container {
             display: flex;
             align-items: center;
-            gap: 10px; /* Space between buttons */
-            margin-top: 10px; /* Space above buttons */
+            gap: 10px;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -59,10 +55,15 @@
     
     <?php
         if (isset($_GET['Shoes_ID'])) {
-            $stmt = $pdo->prepare("SELECT * FROM Shoes WHERE Shoes_ID = ?");
+            $stmt = $pdo->prepare("SELECT * FROM shoes WHERE Shoes_ID = ?");
             $stmt->bindParam(1, $_GET['Shoes_ID']);
             $stmt->execute();
             $row = $stmt->fetch();
+
+            // Decode stock_data JSON
+            if ($row) {
+                $stock_data = json_decode($row['stock_data'], true);
+            }
         }
     ?>
     
@@ -95,26 +96,49 @@
                 <h2 class="subtitle"><?=$row["title"]?></h2>
                 <h2><?=$row["price"]?><span> บาท</span></h2>
                 
-                <?php if (!isset($_SESSION['username'])): ?>
-                    <h5 style="color: red;">กรุณาเข้าสู่ระบบเพื่อซื้อสินค้า</h5>
-                <?php else: ?>
+                <form method="post" action="../cart.php?action=add&Shoes_ID=<?=$row["Shoes_ID"]?>">
+                    <input type="hidden" name="pname" value="<?=htmlspecialchars($row["name"])?>">
+                    <input type="hidden" name="price" value="<?=htmlspecialchars($row["price"])?>">
+
+                    <label for="color">Color:</label>
+                    <select name="color" id="color" required>
+                        <option value="">Select Color</option>
+                        <?php
+                            $colors = array_unique(array_column($stock_data, 'color'));
+                            foreach ($colors as $color) {
+                                echo "<option value='$color'>$color</option>";
+                            }
+                        ?>
+                    </select>
+                    
+                    <label for="size">Size:</label>
+                    <select name="size" id="size" required>
+                        <option value="">Select Size</option>
+                        <?php
+                            $sizes = array_unique(array_column($stock_data, 'size'));
+                            foreach ($sizes as $size) {
+                                echo "<option value='$size'>$size</option>";
+                            }
+                        ?>
+                    </select>
+
+                    <label for="qty">Quantity:</label>
+                    <input type="number" name="qty" value="1" min="1" class="qty-input" required>
+
                     <div class="button-container">
-                        <form method="post" action="../cart.php?action=add&Shoes_ID=<?=$row["Shoes_ID"]?>&pname=<?=$row["name"]?>&price=<?=$row["price"]?>">
-                            <input type="number" name="qty" value="1" min="1" max="<?=$row["stock"]?>" class="qty-input">
-                            <input class="button is-success" type="submit" value="Add to Cart">
-                        </form>
-                        
-                        <form method="post" action="../Favorites.php?action=add&Shoes_ID=<?=$row["Shoes_ID"]?>" style="display: inline;">
-                            <input class="button is-info" type="submit" value="Add to Favorites">
-                        </form>
+                        <input class="button is-success" type="submit" value="Add to Cart">
                     </div>
-                <?php endif; ?>
+                </form>
+
+                <form method="post" action="../Favorites.php?action=add&Shoes_ID=<?=$row["Shoes_ID"]?>" style="display: inline;">
+                    <input class="button is-info" type="submit" value="Add to Favorites">
+                </form>
             </section>
         </div>
         
         <section class="section is-medium">
             <h3 class="title">รายละเอียดสินค้า</h3>
-            <h4 class="subtitle"><?=$row["detail"]?></h4>
+            <h4 class="subtitle"><?=htmlspecialchars($row["detail"])?></h4>
         </section>
     
     <?php else: ?>
