@@ -99,10 +99,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="text" id="name" name="name" value="<?=htmlspecialchars($user['Name'])?>" required>
 
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="<?=htmlspecialchars($user['Email'])?>" required>
+            <input type="email" id="email" name="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" value="<?=htmlspecialchars($user['Email'])?>" required>
 
             <label for="phone">Phone:</label>
-            <input type="tel" id="phone" name="phone" value="<?=$user['Phone']?>">
+            <input type="tel" id="phone" name="phone" pattern="[0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" value="<?=$user['Phone']?>">
             
             <label for="address">Address:</label>
             <textarea name="address" id="address" placeholder="Write your address" required><?=htmlspecialchars($user['Address'])?></textarea>

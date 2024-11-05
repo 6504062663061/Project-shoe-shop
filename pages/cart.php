@@ -1,273 +1,256 @@
-<?php 
-include "../connect.php";
-session_start(); // Start the session to manage cart data
+<?php
+session_start();
+
+// Database connection with $pdo
+try {
+    $pdo = new PDO("mysql:host=localhost; dbname=sec1_22; charset=utf8", "Wstd22", "oopFBiFc");
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    echo "Database connection failed: " . $e->getMessage();
+    exit();
+}
+
+// Initialize cart session if it doesn't exist
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
+
+// Add item to cart
+if (isset($_GET['action']) && $_GET['action'] == 'add' && isset($_GET['Shoes_ID'])) {
+    $shoe_id = $_GET['Shoes_ID'];
+    $color = $_POST['color'];
+    $size = $_POST['size'];
+    $qty = $_POST['qty'];
+
+    // Fetch shoe details using $pdo
+    $stmt = $pdo->prepare("SELECT name, price FROM shoes WHERE Shoes_ID = :shoe_id");
+    $stmt->execute(['shoe_id' => $shoe_id]);
+    $shoe = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($shoe) {
+        // Add item to cart session
+        $item = [
+            'Shoe_ID' => $shoe_id,
+            'name' => $shoe['name'],
+            'price' => $shoe['price'],
+            'color' => $color,
+            'size' => $size,
+            'qty' => $qty
+        ];
+
+        $_SESSION['cart'][] = $item;
+
+        // Redirect to prevent form resubmission
+        header("Location: cart.php");
+        exit();
+    }
+}
+
+// Remove item from cart
+if (isset($_GET['action']) && $_GET['action'] == 'remove' && isset($_GET['index'])) {
+    $index = $_GET['index'];
+    unset($_SESSION['cart'][$index]);
+    $_SESSION['cart'] = array_values($_SESSION['cart']); // Reindex array
+    header("Location: cart.php");
+    exit();
+}
+
+// Update item quantity
+if (isset($_GET['action']) && ($_GET['action'] == 'increase' || $_GET['action'] == 'decrease') && isset($_GET['index'])) {
+    $index = $_GET['index'];
+    if ($_GET['action'] == 'increase') {
+        $_SESSION['cart'][$index]['qty'] += 1;
+    } elseif ($_GET['action'] == 'decrease' && $_SESSION['cart'][$index]['qty'] > 1) {
+        $_SESSION['cart'][$index]['qty'] -= 1;
+    }
+    header("Location: cart.php");
+    exit();
+}
+
+// Calculate subtotal
+$subtotal = 0;
+foreach ($_SESSION['cart'] as $item) {
+    $subtotal += $item['price'] * $item['qty'];
+}
+
+// Apply Promotion Code and Discounts
+$discount = 0;
+$freeItemsMessage = "";
+$promoMessage = ""; // Message to show if promo is successfully applied
+$promoCode = $_POST['promo_code'] ?? '';
+$totalQuantity = array_sum(array_column($_SESSION["cart"], 'qty'));
+
+if ($promoCode === 'DISCOUNT10' && $totalQuantity >= 2) {
+    $discount = 0.1 * $subtotal; // 10% off
+    $promoMessage = "<p style='color:green;'>Promo Code Applied: 10% discount on subtotal</p>";
+}
+
+// Special Dates Discount (30% off)
+$today = date('j/n');
+$specialDates = ['1/1', '2/2', '3/3', '4/4', '5/5', '6/6', '7/7', '8/8', '9/9', '10/10', '11/11', '12/12'];
+if (in_array($today, $specialDates)) {
+    $discount += 0.3 * $subtotal;
+    $promoMessage .= "<p style='color:green;'>Special Discount: 30% off on today's date!</p>";
+}
+
+// Buy 3 pairs, get 2 free pairs of socks
+if ($totalQuantity >= 3) {
+    $freeItemsMessage = "<p style='color:green;'>Special Offer: Buy 3 pairs, get 2 free pairs of socks!</p>";
+}
+
+// Calculate final total
+$totalAfterDiscount = $subtotal - $discount;
+
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ChicFoot - Shopping Cart</title>
-    <link rel="stylesheet" href="../css/index.css">
+    <meta charset="UTF-8">
+    <title>Your Cart</title>
+    <link rel="stylesheet" href="../../css/index.css">
     <style>
-        .bodycart {
-            background-color: #f7f8fc;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-            color: #333;
+        body {
+            font-family: Arial, sans-serif;
         }
         .cart-container {
-            width: 70%;
             display: flex;
-            gap: 30px;
+            flex-direction: row;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px;
         }
         .cart-items, .cart-summary {
-            background: #fff;
+            width: 45%;
+            background: #f9f9f9;
             border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        .cart-items {
-            width: 65%;
+        .cart-items h2, .cart-summary h2, .cart-items p, .cart-summary p {
+            color: #000;
         }
-        .cart-summary {
-            width: 30%;
-        }
-        .cart-summary h3, .cart-items h2 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #333;
-        }
-        .promo-code {
-            display: flex;
-            margin-bottom: 15px;
-        }
-        .promo-code input[type="text"] {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-right: 10px;
-        }
-        .promo-code button {
-            padding: 8px 15px;
-            border: none;
-            background: #333;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .summary-detail {
+        .cart-item {
             display: flex;
             justify-content: space-between;
             margin-bottom: 15px;
-            font-size: 16px;
-        }
-        .checkout-button {
-            width: 100%;
-            background: #000;
-            color: #fff;
-            padding: 12px;
-            font-size: 18px;
-            font-weight: bold;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-align: center;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 15px;
-            text-align: left;
-            font-size: 14px;
-        }
-        th {
-            font-weight: bold;
-            color: #000;
-            background-color: #f1f1f1;
-        }
-        .cart-item-info {
-            display: flex;
-            gap: 15px;
             align-items: center;
         }
-        .cart-item-thumbnail {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            object-fit: cover;
+        .cart-item img {
+            width: 80px;
+            border-radius: 5px;
         }
-        .cart-item-actions a {
-            color: #e74c3c;
-            font-size: 14px;
-            text-decoration: none;
-            margin-left: 10px;
+        .item-details {
+            flex-grow: 1;
+            margin-left: 15px;
         }
-        .cart-item-actions a:hover {
-            color: #c0392b;
+        .remove-button, .qty-button {
+            background: #d9534f;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .promo-code {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .promo-code input[type="text"] {
+            width: 60%;
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .promo-code button {
+            background: #2fab91;
+            color: #fff;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .checkout-button {
+            background: #2fab91;
+            color: #fff;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
         }
     </style>
 </head>
-
 <body>
-    <?php include '../Template/navbar.php'; ?>
-    
-    <div class="bodycart">
-        <div class="cart-container">
-            <!-- Cart Items Section -->
-            <div class="cart-items">
-                <h2>MY SHOPPING BAG</h2>
-                
-                <?php
-                $message = "";  // To store feedback messages
 
-                // Check for cart actions
-                if (isset($_GET["action"])) {
-                    $pid = $_GET['Shoes_ID'] ?? null;
-                    $color = $_GET['color'] ?? '';
-                    $size = $_GET['size'] ?? '';
-                    $qty = isset($_POST['qty']) ? (int)$_POST['qty'] : 1;
+<?php include '../Template/navbar.php'; ?>
 
-                    $cart_key = "{$pid}_{$color}_{$size}";
-
-                    if ($pid) {
-                        // Fetch product details from database to get price and stock
-                        $stmt = $pdo->prepare("SELECT Shoes_ID, name, price, stock_data FROM shoes WHERE Shoes_ID = :Shoes_ID");
-                        $stmt->execute(['Shoes_ID' => $pid]);
-                        $product = $stmt->fetch();
-
-                        if ($product) {
-                            // Decode stock data to find the correct color and size stock
-                            $stock_data = json_decode($product['stock_data'], true);
-                            $available_stock = 0;
-
-                            foreach ($stock_data as $stock_item) {
-                                if ($stock_item['color'] === $color && $stock_item['size'] == $size) {
-                                    $available_stock = $stock_item['stock'];
-                                    break;
-                                }
-                            }
-
-                            if ($_GET["action"] == "add") {
-                                if ($qty > 0 && $qty <= $available_stock) {
-                                    $_SESSION['cart'][$cart_key] = [
-                                        'qty' => $qty,
-                                        'price' => $product['price'],
-                                        'pname' => $product['name'],
-                                        'Shoes_ID' => $pid,
-                                        'color' => $color,
-                                        'size' => $size
-                                    ];
-                                    $message = "<p class='message success'>Item added to cart.</p>";
-                                } else {
-                                    $message = "<p class='message'>Requested quantity exceeds available stock!</p>";
-                                }
-                            } elseif ($_GET["action"] == "update") {
-                                if ($qty <= $available_stock) {
-                                    $_SESSION['cart'][$cart_key]['qty'] = $qty;
-                                    $message = "<p class='message success'>Quantity updated.</p>";
-                                } else {
-                                    $message = "<p class='message'>Quantity exceeds stock limit!</p>";
-                                }
-                            } elseif ($_GET["action"] == "delete") {
-                                unset($_SESSION['cart'][$cart_key]);
-                                $message = "<p class='message success'>Item removed from cart.</p>";
-                            }
-                        } else {
-                            $message = "<p class='message'>Product not found in the database!</p>";
-                        }
-                    } else {
-                        $message = "<p class='message'>Product ID is missing!</p>";
-                    }
-                }
-
-                echo $message; // Display feedback messages
-
-                if (!empty($_SESSION["cart"])) {
-                    $sum = 0;
-                    ?>
-                    <table>
-                        <tr>
-                            <th>PRODUCT</th>
-                            <th>COLOR</th>
-                            <th>SIZE</th>
-                            <th>PRICE</th>
-                            <th>QUANTITY</th>
-                            <th>TOTAL</th>
-                            <th>ACTIONS</th>
-                        </tr>
-                        <?php
-                        foreach ($_SESSION["cart"] as $key => $item) {
-                            $pid = explode('_', $key)[0];
-                            $total = $item["price"] * $item["qty"];
-                            $sum += $total;
-                            
-                            // Determine the image path
-                            $imagePath = "../sphoto/default-image.jpg";
-                            $extensions = ['jpg', 'png', 'jpeg'];
-                            foreach ($extensions as $ext) {
-                                if (file_exists("../sphoto/{$item['Shoes_ID']}.$ext")) {
-                                    $imagePath = "../sphoto/{$item['Shoes_ID']}.$ext";
-                                    break;
-                                }
-                            }
-                            ?>
-                            <tr class="cart-item">
-                                <td class="cart-item-info">
-                                    <img src="<?= $imagePath ?>" class="cart-item-thumbnail" alt="Product Image">
-                                    <div>
-                                        <?= htmlspecialchars($item["pname"]) ?>
-                                    </div>
-                                </td>
-                                <td><?= htmlspecialchars($item["color"]) ?></td>
-                                <td><?= htmlspecialchars($item["size"]) ?></td>
-                                <td><?= htmlspecialchars(number_format($item["price"], 2)) ?> ฿</td>
-                                <td>
-                                    <form method="post" action="?action=update&Shoes_ID=<?= htmlspecialchars($pid) ?>&color=<?= htmlspecialchars($item["color"]) ?>&size=<?= htmlspecialchars($item["size"]) ?>">
-                                        <input type="number" name="qty" value="<?= htmlspecialchars($item["qty"]) ?>" min="1">
-                                        <button type="submit">Update</button>
-                                    </form>
-                                </td>
-                                <td><?= htmlspecialchars(number_format($total, 2)) ?> ฿</td>
-                                <td>
-                                    <a href="?action=delete&Shoes_ID=<?= htmlspecialchars($pid) ?>&color=<?= htmlspecialchars($item["color"]) ?>&size=<?= htmlspecialchars($item["size"]) ?>">Remove</a>
-                                </td>
-                            </tr>
-                            <?php
-                        }
-                        ?>
-                    </table>
-                    <?php
-                } else {
-                    echo "<p>Your cart is empty!</p>";
-                }
-                ?>
-            </div>
-
-            <!-- Cart Summary Section -->
-            <div class="cart-summary">
-                <h3>SUMMARY</h3>
-                
-                <div class="promo-code">
-                    <input type="text" placeholder="Do you have a promo code?">
-                    <button>Apply</button>
+<div class="cart-container">
+    <div class="cart-items">
+        <h2>Shopping Cart</h2>
+        <?php if (!empty($_SESSION['cart'])): ?>
+            <?php foreach ($_SESSION['cart'] as $index => $item): ?>
+                <div class="cart-item">
+                    <div>
+                        <img src="../sphoto/<?= htmlspecialchars($item['Shoe_ID']) ?>.jpg" alt="<?= htmlspecialchars($item['name']) ?>">
+                    </div>
+                    <div class="item-details">
+                        <p><strong><?= htmlspecialchars($item['name']) ?></strong></p>
+                        <p>Color: <?= htmlspecialchars($item['color']) ?>, Size: <?= htmlspecialchars($item['size']) ?></p>
+                        <p>
+                            Qty: <?= htmlspecialchars($item['qty']) ?>
+                            <form method="get" action="cart.php" style="display:inline;">
+                                <input type="hidden" name="action" value="increase">
+                                <input type="hidden" name="index" value="<?= $index ?>">
+                                <button type="submit" class="qty-button">+</button>
+                            </form>
+                            <form method="get" action="cart.php" style="display:inline;">
+                                <input type="hidden" name="action" value="decrease">
+                                <input type="hidden" name="index" value="<?= $index ?>">
+                                <button type="submit" class="qty-button">-</button>
+                            </form>
+                        </p>
+                    </div>
+                    <div>
+                        <p>฿ <?= htmlspecialchars($item['price'] * $item['qty']) ?></p>
+                    </div>
+                    <form method="get" action="cart.php">
+                        <input type="hidden" name="action" value="remove">
+                        <input type="hidden" name="index" value="<?= $index ?>">
+                        <button type="submit" class="remove-button">Remove</button>
+                    </form>
                 </div>
-
-                <div class="summary-detail" style="font-weight: bold; font-size: 18px;">
-                    <span>Subtotal</span>
-                    <span><?= number_format($sum, 2) ?> ฿</span>
-                </div>
-
-                <button class="checkout-button">CHECKOUT</button>
-            </div>
-        </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p>Your cart is empty.</p>
+        <?php endif; ?>
     </div>
-    
-    <?php include '../Template/footer.php'; ?>
+    <div class="cart-summary">
+        <h2>Order Summary</h2>
+        <p>Subtotal: ฿ <?= htmlspecialchars($subtotal) ?></p>
+
+        <form method="post" class="promo-code">
+            <input type="text" name="promo_code" placeholder="Enter promo code">
+            <button type="submit" name="apply_code">Apply</button>
+        </form>
+        
+        <?= $promoMessage ?> <!-- Display promo success message here -->
+
+        <?php if ($freeItemsMessage): ?>
+            <?= $freeItemsMessage ?>
+        <?php endif; ?>
+
+        <h3>Total After Discount: ฿ <?= htmlspecialchars($totalAfterDiscount) ?></h3>
+
+        <form method="post" action="checkout.php">
+            <button type="submit" class="checkout-button">Proceed to Checkout</button>
+        </form>
+    </div>
+</div>
+
+<?php include '../Template/footer.php'; ?>
+
 </body>
 </html>

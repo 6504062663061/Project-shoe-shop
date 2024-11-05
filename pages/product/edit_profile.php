@@ -90,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="text" id="name" name="name" value="<?= htmlspecialchars($user['name']); ?>" required>
 
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']); ?>" required>
+            <input type="email" id="email" name="email"  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" value="<?= htmlspecialchars($user['email']); ?>" required>
 
             <label for="phone">Phone:</label>
             <input type="tel" id="phone" name="phone" value="<?= htmlspecialchars($user['phone']); ?>">

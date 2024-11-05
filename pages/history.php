@@ -1,7 +1,7 @@
 <?php
-session_start();  // Ensure session_start() is at the top of the file
+session_start();  
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['username'])) {
     echo "<p class='message'>Please log in to view your order history.</p>";
     exit();
@@ -12,6 +12,7 @@ include "../connect.php";
 
 <!DOCTYPE html>
 <html>
+<head>
     <style>
         * {
             margin: 0;
@@ -71,6 +72,10 @@ include "../connect.php";
             color: #34495e;
             font-weight: 500;
             border-bottom: 1px solid #eaeaea;
+            cursor: pointer; 
+        }
+        td:hover {
+            background-color: #e8f6f3; 
         }
         .message {
             text-align: center;
@@ -85,22 +90,71 @@ include "../connect.php";
         .order-item:hover {
             background-color: #f0f8ff;
         }
-    </style>
-  </head>
 
-  <body>
+        
+        .filter-button {
+            background-color: #3498db; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            padding: 10px 15px; 
+            font-size: 16px; 
+            margin: 5px; 
+            cursor: pointer; 
+            transition: background-color 0.3s; 
+        }
+
+        .filter-button:hover {
+            background-color: #2980b9; 
+        }
+
+        .filter-button:focus {
+            outline: none; 
+            box-shadow: 0 0 5px rgba(0, 151, 219, 0.5); 
+        }
+    </style>
+    <script>
+        // Function to filter orders based on status
+        function filterOrders(status) {
+            const rows = document.querySelectorAll(".order-item");
+            rows.forEach(row => {
+                if (status === "all" || row.cells[1].textContent === status) {
+                    row.style.display = ""; // Show row
+                } else {
+                    row.style.display = "none"; // Hide row
+                }
+            });
+        }
+
+        // Function to highlight the selected row
+        function highlightRow(event) {
+            const rows = document.querySelectorAll(".order-item");
+            rows.forEach(row => row.style.backgroundColor = ""); // Reset all rows
+            event.currentTarget.style.backgroundColor = "#d1e7dd"; // Highlight selected row
+        }
+    </script>
+</head>
+
+<body>
     <?php include '../Template/navbar.php'; ?>
     <div class="bodycart">
         <div class="order-container">
-            <!-- Logo at the top of the card -->
-            <img src="../logonew.png" alt="ChicFoot Logo">  <!-- Adjust the path as needed -->
+           
+            <img src="../logonew.png" alt="ChicFoot Logo">  
             <h2>Order History</h2>
 
+            <div>
+                
+                <button class="filter-button" onclick="filterOrders('all')">All Orders</button>
+                <button class="filter-button" onclick="filterOrders('Pending')">Pending Orders</button>
+                <button class="filter-button" onclick="filterOrders('Completed')">Completed Orders</button>
+            </div>
+
             <?php
-            // Retrieve username from the session
+            
             $username = $_SESSION['username'];
 
-            // Query to retrieve order history with time and date from the receipt table
+            
             $sql = "SELECT shoeorder.Order_ID, shoeorder.Order_Status, receipt.Time, receipt.DATE_Bill 
                     FROM shoeorder
                     JOIN receipt ON shoeorder.Order_ID = receipt.Order_ID
@@ -118,9 +172,9 @@ include "../connect.php";
                             <th>Date</th>
                         </tr>';
                 
-                // Loop through orders and display in the table
+                
                 foreach ($orders as $order) {
-                    echo '<tr class="order-item">
+                    echo '<tr class="order-item" onclick="highlightRow(event)">
                             <td>' . htmlspecialchars($order["Order_ID"]) . '</td>
                             <td>' . htmlspecialchars($order["Order_Status"]) . '</td>
                             <td>' . htmlspecialchars($order["Time"]) . '</td>
@@ -135,5 +189,5 @@ include "../connect.php";
         </div>
     </div>
     <?php include '../Template/footer.php'; ?>
-  </body>
+</body>
 </html>

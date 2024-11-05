@@ -2,6 +2,20 @@
 
 <!DOCTYPE html>
 <html>
+<style>
+    .shoe-list {
+        display: flex;                /* Enable Flexbox */
+        flex-wrap: wrap;             /* Allow items to wrap to the next row */
+        justify-content: center;      /* Center items */
+        gap: 20px;                   /* Add some space between items */
+    }
+
+    .shoe-list > div {
+        flex: 0 1 calc(50% - 20px);  /* Each item takes up 50% of the row minus gaps */
+        box-sizing: border-box;       /* Include padding and border in the element's total width and height */
+        max-width: 300px;             /* Adjust max-width to suit your design */
+    }
+</style>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -56,19 +70,21 @@
             loadAllProducts(); // Load all products
         }
 
-        function loadAllProducts() {
+        function loadAllProducts(page = 1) {
             var xmlHttp = new XMLHttpRequest();
             var shoeResults = document.getElementById("shoeResults");
 
             xmlHttp.onreadystatechange = function() {
                 if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-                    shoeResults.innerHTML = xmlHttp.responseText; // Load all products
+                    shoeResults.innerHTML = xmlHttp.responseText;
                 }
             };
 
-            xmlHttp.open("GET", "load_all_shoes.php", true); 
+            var url = "load_all_shoes.php?page=" + page;
+            xmlHttp.open("GET", url, true);
             xmlHttp.send();
         }
+
 
         function initFilters() {
             document.getElementById("min_price").addEventListener("input", filterShoes);
@@ -78,7 +94,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             initFilters();
-            loadAllProducts(); 
+            loadAllProducts(1); 
         });
     </script>
 </head>
@@ -88,9 +104,9 @@ include '../../Template/navbar.php';
 ?>
 
 <body>
-    <div class="fixed-grid">
-        <div class="grid">
-            <form id="filterForm" class="cell">
+    <div >
+        <div >
+            <form id="filterForm">
                 <label for="category">Category:</label>
                 <select name="category" id="category" onchange="redirectToCategory()">
                     <option value="">All Categories</option>
@@ -121,7 +137,7 @@ include '../../Template/navbar.php';
             </form>
         </div>
 
-        <div id="shoeResults" class="cell columns is-multiline is-2">
+        <div id="shoeResults">
         </div>
     </div>
 </body>

@@ -16,6 +16,7 @@
             cursor: pointer;
             font-weight: bold;
             color: white;
+            margin : 10px;
         }
 
         .is-success {

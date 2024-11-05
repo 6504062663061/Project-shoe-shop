@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shoe Store</title>
     <style>
-        /* General hero section styles */
+        
         .hero {
-            background-color: #77efb5; /* เปลี่ยนพื้นหลังเป็นสีเทาเข้ม */
-            color: #fff; /* เปลี่ยนสีตัวอักษรในส่วนนี้ให้เป็นสีขาว */
+            
+            color: #fff; 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -17,30 +17,32 @@
             border-radius: 10px;
         }
 
-        .title {
-            font-size: 3em;
-            text-align: center;
-            margin: 0;
-            font-weight: bold;
-        }
-
-        .subtitle {
-            font-size: 1.5em;
-            text-align: center;
-            margin: 10px 0 20px;
-            color: white; /* ปรับสี subtitle ให้เป็นสีขาวหม่น */
-            font-weight: 500;
-        }
+        
 
         /* Slider styles */
         .slider {
             position: relative;
-            width: 100%;
-            max-width: 100%;
-            height: 500px; /* สามารถปรับเปลี่ยนตามความต้องการ */
+            width: 600px;
+            height: 200px;
+             
             overflow: hidden;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        /* Tablets */
+        @media (min-width: 768px) {
+            .slider {
+                width: 1000px;
+                height: 500px; 
+            }
+        }
+
+        /* desktop */
+        @media (min-width: 1024px) {
+            .slider {
+                width: 1900px; 
+                height: 900px; 
+            }
         }
 
         .slide {
@@ -51,7 +53,7 @@
             left: 0;
             opacity: 0;
             transition: opacity 1s ease-in-out;
-            object-fit: cover; /* ให้ภาพครอบคลุมพื้นที่สไลเดอร์ */
+            object-fit: cover; 
         }
 
         .slide.active {
@@ -64,14 +66,11 @@
 <header>
 <section class="hero">
   <div class="hero-body">
-    <div class="text-content">
-      <p class="title">CHICFOOT</p>
-      <p class="subtitle">Best Shoes shop website in the world</p>
-    </div>
+    
     <div class="slider">
-      <img src="./sphoto/shoe1.jpg" class="slide" alt="Shoe 1">
-      <img src="./sphoto/shoe2.jpg" class="slide" alt="Shoe 2">
-      <img src="./sphoto/shoe3.jpg" class="slide" alt="Shoe 3">
+      <img src="https://cdn.discordapp.com/attachments/1138506358900138004/1302966912820449310/Design_a_promotional_banner_for_ChicFoot_featuring.jpg?ex=672a09ff&is=6728b87f&hm=c4c0c480fc86eba5beed05be1751b577f7988694ee41bf90fe5347cd4582611b&" class="slide" alt="Placeholder Image 1">
+      <img src="https://cdn.discordapp.com/attachments/1138506358900138004/1302966913240010813/Create_a_promotional_banner_for_ChicFoot_featuring.jpg?ex=672a0a00&is=6728b880&hm=389dfd05d24270479d4e2521799d20ea6a061f3468a0d5ed3f5ee53aa8fcb8c2&" class="slide" alt="Placeholder Image 2">
+      <img src="https://cdn.discordapp.com/attachments/1138506358900138004/1302966913688670218/Create_a_promotional_banner_for_the_brand_ChicFoo.jpg?ex=672a0a00&is=6728b880&hm=e08e46880555f53fb2bafa000148361bfcf91723a3c2e64abb5f4240b6e2f8dc&" class="slide" alt="Placeholder Image 3">
     </div>
   </div>
 </section>

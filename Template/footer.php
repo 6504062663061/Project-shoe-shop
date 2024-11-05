@@ -4,7 +4,7 @@
             <h3>Customer Services</h3>
             <ul>
                 <li><a href="/~csb6563061/Project-shoe-shop/pages/contact.php">Contact</a></li>
-                <li><a href="#">Terms and Conditions</a></li>
+                <li><a href="/~csb6563061/Project-shoe-shop/pages/branch.php">Our branch</a></li>
                 
             </ul>
             

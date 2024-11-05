@@ -1,24 +1,20 @@
 <?php
-include '/~csb6563061/Project-shoe-shop/connect.php'; 
+include '../connect.php'; 
 
-if (isset($_GET['query'])) {
-    $search = "%" . $_GET['query'] . "%";
-    
-    $stmt = $pdo->prepare("SELECT * FROM Shoes WHERE name LIKE ?");
-    $stmt->bindParam(1, $search);
-    $stmt->execute();
-    
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    if (count($results) > 0) {
-        foreach ($results as $row) {
-            echo "<div class='shoe-result' style='display:flex; '>";
-            echo "<img src='/~csb6563061/Project-shoe-shop/sphoto" . $row["Shoes_ID"] . "' alt='" . htmlspecialchars($row['name']) . "' style='width: 100px;'>";
-            echo "<p>" . htmlspecialchars($row['name']) . "</p>";
-            echo "</div>";
-        }
-    } else {
-        echo "<p>No results found</p>";
+$keyword = $_GET['keyword'];
+
+$query = $pdo->prepare("SELECT * FROM shoes WHERE name LIKE ?");
+$query->execute(["%$keyword%"]);
+$results = $query->fetchAll();
+
+if (count($results) > 0) {
+    foreach ($results as $row) {
+        // Use single quotes around the href and proper concatenation
+        echo "<a href='/~csb6563061/Project-shoe-shop/pages/product/shoedetail.php?Shoes_ID=" . htmlspecialchars($row["Shoes_ID"]) . "'>";
+        echo "<div class='item' >" . htmlspecialchars($row['name']) . "</div>";
+        echo "</a>";
     }
+} else {
+    echo "<div class='item'>No results found</div>";
 }
 ?>

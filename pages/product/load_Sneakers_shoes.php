@@ -27,7 +27,7 @@
         max-width: 200px;
         margin: 10px auto;
         font-family: Arial, sans-serif;
-        " class="column is-one-quarter">
+        " >
         <a href="shoedetail.php?Shoes_ID=<?=$row["Shoes_ID"]?>" style="text-decoration: none; color: inherit;">
             <img src='<?=$imagePath?>' width='120' style="border-radius: 8px; margin-bottom: 12px;">
             <h2 style="font-size: 18px; font-weight: 600; margin: 10px 0; color: #333;"><?=$row["name"]?></h2>

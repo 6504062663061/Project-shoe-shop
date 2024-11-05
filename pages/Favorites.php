@@ -1,6 +1,41 @@
 <?php
 session_start();
 include "../connect.php";
+
+// อ่าน favorites จาก Cookies (ถ้ามี)
+$favorites = [];
+if (isset($_COOKIE['favorites'])) {
+    $favorites = json_decode($_COOKIE['favorites'], true) ?? [];
+}
+
+// ตรวจสอบ action
+if (isset($_GET["action"])) {
+    $Shoes_ID = $_GET['Shoes_ID'];
+    $name = $_GET['name'] ?? '';  
+
+    if ($Shoes_ID) {
+        if ($_GET["action"] == "add") {
+            $favorites[$Shoes_ID] = ['name' => $name];
+            $message = "<p class='message success'>Item added to favorites.</p>";
+        } elseif ($_GET["action"] == "delete") {
+            unset($favorites[$Shoes_ID]);
+            $message = "<p class='message success'>Item removed from favorites.</p>";
+        }
+
+        // ตั้งค่า favorites ลงใน Cookies ด้วยการตั้งค่าข้อมูลอย่างละเอียด
+        setcookie('favorites', json_encode($favorites), [
+            'expires' => time() + (86400 * 30), // 30 วัน
+            'path' => '/',
+            'secure' => isset($_SERVER['HTTPS']), // ถ้าใช้ HTTPS ให้ตั้งค่าเป็น secure
+            'httponly' => true, 
+            'samesite' => 'Lax',
+        ]);
+
+        // รีเฟรชหน้าเพื่อให้ Cookies ถูกอ่านอีกครั้ง
+        header("Location: ".$_SERVER['PHP_SELF']);
+        exit;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -96,10 +131,10 @@ include "../connect.php";
             color: green;
         }
         .logo {
-            display: block; /* Center the logo */
-            margin: 0 auto 20px; /* Center and add bottom margin */
-            width: 250px; /* Set width to 250px */
-            height: auto; /* Maintain aspect ratio */
+            display: block; 
+            margin: 0 auto 20px; 
+            width: 250px; 
+            height: auto; 
         }
     </style>
 </head>
@@ -107,43 +142,21 @@ include "../connect.php";
     <?php include '../Template/navbar.php'; ?>
     <div class="bodycart">
         <div class="favorites-container">
-            <img src="../logonew.png" alt="ChicFoot Logo" class="logo"> <!-- Add your logo here -->
+            <img src="../logonew.png" alt="ChicFoot Logo" class="logo"> 
             <h2>Favorites</h2>
 
             <?php
-            $message = "";  // To store feedback messages
+            echo $message ?? "";  // แสดงข้อความ
 
-            // Check for action
-            if (isset($_GET["action"])) {
-                $Shoes_ID = $_GET['Shoes_ID'];
-                $name = $_GET['name'] ?? '';  // Get product name from URL
-
-                if ($Shoes_ID) {
-                    if ($_GET["action"] == "add") {
-                        // Add to favorites with the product name
-                        $_SESSION['favorites'][$Shoes_ID] = [
-                            'name' => $name  // Store the product name in the session
-                        ];
-                        $message = "<p class='message success'>Item added to favorites.</p>";
-                    } elseif ($_GET["action"] == "delete") {
-                        // Remove from favorites
-                        unset($_SESSION['favorites'][$Shoes_ID]);
-                        $message = "<p class='message success'>Item removed from favorites.</p>";
-                    }
-                }
-            }
-
-            echo $message;  // Display any messages
-
-            if (!empty($_SESSION["favorites"])) {
+            // ตรวจสอบว่ามีรายการโปรดหรือไม่
+            if (!empty($favorites)) {
                 ?>
                 <div class="favorites-grid">
                     <?php
-                    foreach ($_SESSION["favorites"] as $Shoes_ID => $item) {
-                        // Try to locate the correct image file for the shoe
+                    foreach ($favorites as $Shoes_ID => $item) {
                         $extensions = ['jpg', 'png', 'jpeg'];
-                        $imagePath = '../sphoto/default-image.jpg';  // Default image if none found
-                        $foundImage = false;  // Flag to track if an image is found
+                        $imagePath = '../sphoto/default-image.jpg';  
+                        $foundImage = false;
 
                         foreach ($extensions as $ext) {
                             $tempPath = "../sphoto/{$Shoes_ID}.$ext";
@@ -154,13 +167,15 @@ include "../connect.php";
                             }
                         }
 
-                        // Debugging output (for development only)
                         if (!$foundImage) {
                             echo "<p class='message'>Image not found for Shoe ID: " . htmlspecialchars($Shoes_ID) . "</p>";
                         }
                         ?>
                         <div class="favorite-card">
-                            <img src="<?= htmlspecialchars($imagePath) ?>" alt="Favorite Product Image">
+                            <a href="./product/shoedetail.php?Shoes_ID=<?= $Shoes_ID ?>">
+                                <img src="<?= htmlspecialchars($imagePath) ?>" alt="Favorite Product Image">
+                            </a>
+
                             <h3><?= htmlspecialchars($item["name"]) ?></h3>
                             <div class="actions">
                                 <a href="?action=delete&Shoes_ID=<?= htmlspecialchars($Shoes_ID) ?>">Remove from Favorites</a>

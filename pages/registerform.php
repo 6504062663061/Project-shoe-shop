@@ -194,11 +194,11 @@
             <img src="../logonew.png" alt="Site Logo">
         </div>
         <form action="./register.php" method="POST">
-            <input type="text" id="username" name="username" placeholder="Username"  required oninput="checkUsername()">
+            <input type="text" id="username" name="username" placeholder="Username"  pattern="^[a-zA-Z0-9_-]{3,20}$" required oninput="checkUsername()">
             <div id="usernameResult" style="color: red;"></div>
-            <input type="text" name="firstname" id="firstname" placeholder="Firstname" required><br>
-            <input type="text" name="lastname" id="lastname" placeholder="Lastname" required><br>
-            <input type="email" name="email" id="email" placeholder="Email" onblur="checkemail()" required><br>
+            <input type="text" name="firstname" id="firstname" placeholder="Firstname" pattern="^[A-Za-zก-ฮ]*$" required><br>
+            <input type="text" name="lastname" id="lastname" placeholder="Lastname" pattern="^[A-Za-zก-ฮ]*$" required><br>
+            <input type="email" name="email" id="email" placeholder="Email"  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" onblur="checkemail()" required><br>
             <div id="emailResult"></div>
             <input type="password" name="password" id="password" placeholder="Password" required oninput="validatePasswords()">
             <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password" required oninput="validatePasswords()">

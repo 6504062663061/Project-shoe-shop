@@ -9,21 +9,34 @@ include "connect.php";
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ChicFoot - Best Sellers</title>
     <link rel="stylesheet" href="./css/index.css">
+    <style>
+        
+        .card {
+            margin: 10px;
+        }
+
+        /* desktop */
+        @media (min-width: 1024px) {
+            .card {
+                margin: 15px;
+            }
+        }
+    </style>
 </head>
 
 <?php 
 include './Template/navbar.php';
 include './Template/header.php';
 ?>
+<script src="//code.tidio.co/uv6n4xqgtgthacrt0mxm7hgghnyn3fbc.js" async></script>
 <body>
-
 <section class="section">
     <div class="container has-text-centered">
         <h1 class="title">BEST SELLER</h1>
         <br>
     </div>
     
-    <div class="columns is-multiline is-2">
+    <div class="columns is-multiline is-mobile">
         <?php
             // Query to get the top 6 best-selling shoes based on the quantity sold
             $stmt = $pdo->prepare("
@@ -57,12 +70,12 @@ include './Template/header.php';
             }
         ?>
         
-        <div class="column is-4">
+        <div class="column is-12-mobile is-6-tablet is-3-desktop">
             <div class="card">
                 <div class="card-image">
                     <figure class="image is-4by3">
                         <a href="./pages/product/shoedetail.php?Shoes_ID=<?=$row["Shoes_ID"]?>">
-                            <img src="<?=$imagePath?>" alt="<?=$row["name"]?>">
+                            <img src="<?=$imagePath?>" alt="<?=htmlspecialchars($row["name"])?>">
                         </a>
                     </figure>
                 </div>
@@ -86,7 +99,6 @@ include './Template/header.php';
         <?php endwhile; ?>
     </div>
 </section>
-
 <?php include './Template/footer.php'; ?>
 </body>
 </html>

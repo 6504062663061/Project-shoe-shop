@@ -19,7 +19,7 @@
 
         while ($row = $stmt->fetch()) {
             echo "<div>";
-            echo "<img src='./memphoto/" . $row["Username"] . ".jpg' width=100><br>";
+            echo "<img src='../../memphoto/" . $row["Username"] . ".jpg' width=100><br>";
             echo "ชื่อสมาชิก : " . $row["Name"] . "<br>";
             echo "ที่อยู่ : " . $row["Address"] . "<br>";
             echo "เบอร์โทรศัพท์ : " . $row["Phone"] . "<br>";
