@@ -27,25 +27,15 @@ if (!$user) {
     exit();
 }
 
-// Calculate total price
+// Calculate subtotal
 $subtotal = 0;
 foreach ($_SESSION['cart'] as $item) {
     $subtotal += $item['price'] * $item['qty'];
 }
 
-// Example discount application
-if (!isset($_SESSION['discount'])) {
-    // Check for a promo code and apply discount if needed
-    $promoCode = $_SESSION['promo_code'] ?? ''; // Assuming the promo code is stored here
-    if ($promoCode === 'DISCOUNT10') {
-        $_SESSION['discount'] = $subtotal * 0.1; // 10% discount
-    } else {
-        $_SESSION['discount'] = 0; // No discount
-    }
-}
-
-// Calculate total after discount
-$totalAfterDiscount = $subtotal - $_SESSION['discount'];
+// Retrieve discount from session (calculated in cart.php)
+$discountAmount = $_SESSION['discount'] ?? 0;
+$totalAfterDiscount = $subtotal - $discountAmount;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['confirm'])) {
     // Start transaction
@@ -66,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['confirm'])) {
             ]);
         }
 
-        // Generate a unique Receipt_ID using time()
+        // Generate a unique Receipt_ID
         $receipt_id = time();
 
         // Insert into `receipt` with generated Receipt_ID
@@ -81,9 +71,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['confirm'])) {
         // Commit transaction
         $pdo->commit();
 
-        // Clear cart
-        unset($_SESSION['cart']);
-        echo "<p style='color:green;'>Order confirmed! Your Receipt ID is $receipt_id.</p>";
+        // Store Receipt ID in session and redirect to confirmation page
+        $_SESSION['receipt_id'] = $receipt_id;
+        header("Location: order_confirmation.php");
+        exit();
     } catch (Exception $e) {
         // Rollback on error
         $pdo->rollBack();
@@ -102,68 +93,121 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['confirm'])) {
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            color: #333;
         }
         .checkout-container {
-            width: 50%;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+            width: 60%;
+            margin: 40px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            color: #000;
         }
         h2 {
             color: #2fab91;
-        }
-        .checkout-summary, .user-info, .total-section {
+            text-align: center;
             margin-bottom: 20px;
+        }
+        .user-info, .checkout-summary, .total-section {
+            margin-bottom: 20px;
+        }
+        .user-info h3, .checkout-summary h3, .total-section h3 {
+            color: #333;
+        }
+        .product-list {
+            margin-bottom: 20px;
+        }
+        .product-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .product-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 15px;
+        }
+        .product-details {
+            flex: 1;
+            color: #333;
+        }
+        .qr-code {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .qr-code img {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+        }
+        .button, .button-secondary {
+            display: inline-block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
         }
         .button {
             background-color: #2fab91;
-            color: #fff;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            text-align: center;
-            display: inline-block;
+            color: #000;
         }
         .button-secondary {
             background-color: #ccc;
             color: #000;
-            text-align: center;
-            display: inline-block;
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-decoration: none;
         }
     </style>
 </head>
 <body>
+
+<?php include '../Template/navbar.php'; ?>
 
 <div class="checkout-container">
     <h2>Checkout</h2>
 
     <div class="user-info">
         <h3>Shipping Information</h3>
-        <p><strong>Name:</strong> <?= htmlspecialchars($user['Name']) ?></p>
-        <p><strong>Address:</strong> <?= htmlspecialchars($user['Address']) ?></p>
-        <p><strong>Phone:</strong> <?= htmlspecialchars($user['Phone']) ?></p>
+        <p><strong style="color: black;">Name:</strong> <?= htmlspecialchars($user['Name']) ?></p>
+        <p><strong style="color: black;">Address:</strong> <?= htmlspecialchars($user['Address']) ?></p>
+        <p><strong style="color: black;">Phone:</strong> <?= htmlspecialchars($user['Phone']) ?></p>
     </div>
 
     <div class="checkout-summary">
         <h3>Order Summary</h3>
-        <?php foreach ($_SESSION['cart'] as $item): ?>
-            <p><?= htmlspecialchars($item['name']) ?> (Color: <?= htmlspecialchars($item['color']) ?>, Size: <?= htmlspecialchars($item['size']) ?>) - Qty: <?= htmlspecialchars($item['qty']) ?> - ฿<?= htmlspecialchars($item['price'] * $item['qty']) ?></p>
-        <?php endforeach; ?>
-        <p><strong>Subtotal:</strong> ฿<?= htmlspecialchars($subtotal) ?></p>
-        <?php if ($_SESSION['discount'] > 0): ?>
-            <p><strong>Discount:</strong> ฿<?= htmlspecialchars($_SESSION['discount']) ?></p>
+        <div class="product-list">
+            <?php foreach ($_SESSION['cart'] as $item): ?>
+                <div class="product-item">
+                    <img src="../sphoto/<?= htmlspecialchars($item['Shoe_ID']) ?>.jpg" alt="<?= htmlspecialchars($item['name']) ?>">
+                    <div class="product-details">
+                        <p><strong style="color: black;"><?= htmlspecialchars($item['name']) ?></strong></p>
+                        <p>Color: <?= htmlspecialchars($item['color']) ?>, Size: <?= htmlspecialchars($item['size']) ?></p>
+                        <p>Qty: <?= htmlspecialchars($item['qty']) ?> - ฿<?= htmlspecialchars($item['price'] * $item['qty']) ?></p>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <p><strong style="color: black;">Subtotal:</strong> ฿<?= htmlspecialchars($subtotal) ?></p>
+        
+        <?php if ($discountAmount > 0): ?>
+            <p><strong style="color: black;">Discount:</strong> -฿<?= htmlspecialchars($discountAmount) ?></p>
         <?php endif; ?>
     </div>
 
     <div class="total-section">
         <h3>Total Price</h3>
-        <p><strong>Total After Discount:</strong> ฿<?= htmlspecialchars($totalAfterDiscount) ?></p>
+        <p><strong style="color: black;">Total After Discount:</strong> ฿<?= htmlspecialchars($totalAfterDiscount) ?></p>
+    </div>
+
+    <div class="qr-code">
+        <h3>Scan to Pay</h3>
+        <img src="../sphoto/IMG_3656.png" alt="QR Code"> <!-- Update path if needed -->
     </div>
 
     <form method="post">
@@ -171,6 +215,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['confirm'])) {
         <a href="cart.php" class="button-secondary">Return to Cart</a>
     </form>
 </div>
+
+<?php include '../Template/footer.php'; ?>
 
 </body>
 </html>

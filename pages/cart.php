@@ -75,14 +75,18 @@ foreach ($_SESSION['cart'] as $item) {
 
 // Apply Promotion Code and Discounts
 $discount = 0;
-$freeItemsMessage = "";
 $promoMessage = ""; // Message to show if promo is successfully applied
 $promoCode = $_POST['promo_code'] ?? '';
 $totalQuantity = array_sum(array_column($_SESSION["cart"], 'qty'));
 
-if ($promoCode === 'DISCOUNT10' && $totalQuantity >= 2) {
-    $discount = 0.1 * $subtotal; // 10% off
-    $promoMessage = "<p style='color:green;'>Promo Code Applied: 10% discount on subtotal</p>";
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['apply_code'])) {
+    if ($promoCode === 'DISCOUNT10' && $totalQuantity >= 2) {
+        $discount = 0.1 * $subtotal; // 10% off
+        $_SESSION['discount'] = $discount;
+        $promoMessage = "<p style='color:green;'>Promo Code Applied: 10% discount on subtotal</p>";
+    } else {
+        $promoMessage = "<p style='color:red;'>Invalid or inapplicable promo code.</p>";
+    }
 }
 
 // Special Dates Discount (30% off)
@@ -94,6 +98,7 @@ if (in_array($today, $specialDates)) {
 }
 
 // Buy 3 pairs, get 2 free pairs of socks
+$freeItemsMessage = "";
 if ($totalQuantity >= 3) {
     $freeItemsMessage = "<p style='color:green;'>Special Offer: Buy 3 pairs, get 2 free pairs of socks!</p>";
 }
@@ -197,7 +202,7 @@ $totalAfterDiscount = $subtotal - $discount;
                         <img src="../sphoto/<?= htmlspecialchars($item['Shoe_ID']) ?>.jpg" alt="<?= htmlspecialchars($item['name']) ?>">
                     </div>
                     <div class="item-details">
-                        <p><strong><?= htmlspecialchars($item['name']) ?></strong></p>
+                        <p><strong style="color: black;"><?= htmlspecialchars($item['name']) ?></strong></p>
                         <p>Color: <?= htmlspecialchars($item['color']) ?>, Size: <?= htmlspecialchars($item['size']) ?></p>
                         <p>
                             Qty: <?= htmlspecialchars($item['qty']) ?>
@@ -231,18 +236,22 @@ $totalAfterDiscount = $subtotal - $discount;
         <h2>Order Summary</h2>
         <p>Subtotal: ฿ <?= htmlspecialchars($subtotal) ?></p>
 
+        <!-- Promo Code Form -->
         <form method="post" class="promo-code">
             <input type="text" name="promo_code" placeholder="Enter promo code">
             <button type="submit" name="apply_code">Apply</button>
         </form>
-        
-        <?= $promoMessage ?> <!-- Display promo success message here -->
 
-        <?php if ($freeItemsMessage): ?>
-            <?= $freeItemsMessage ?>
+        <!-- Display promo and free item messages -->
+        <?= $promoMessage ?>
+        <?= $freeItemsMessage ?>
+
+        <!-- Show Discount Amount -->
+        <?php if ($discount > 0): ?>
+            <p><strong style="color: black;">Discount:</strong> -฿ <?= htmlspecialchars($discount) ?></p>
         <?php endif; ?>
 
-        <h3>Total After Discount: ฿ <?= htmlspecialchars($totalAfterDiscount) ?></h3>
+        <h3><strong style="color: black;">Total After Discount:฿ <?= htmlspecialchars($totalAfterDiscount) ?></strong> </h3>
 
         <form method="post" action="checkout.php">
             <button type="submit" class="checkout-button">Proceed to Checkout</button>
