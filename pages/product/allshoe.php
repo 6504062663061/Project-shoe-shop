@@ -4,16 +4,16 @@
 <html>
 <style>
     .shoe-list {
-        display: flex;                /* Enable Flexbox */
-        flex-wrap: wrap;             /* Allow items to wrap to the next row */
-        justify-content: center;      /* Center items */
-        gap: 20px;                   /* Add some space between items */
+        display: flex;                
+        flex-wrap: wrap;             
+        justify-content: center;      
+        gap: 20px;                   
     }
 
     .shoe-list > div {
-        flex: 0 1 calc(50% - 20px);  /* Each item takes up 50% of the row minus gaps */
-        box-sizing: border-box;       /* Include padding and border in the element's total width and height */
-        max-width: 300px;             /* Adjust max-width to suit your design */
+        flex: 0 1 calc(50% - 20px);  
+        box-sizing: border-box;      
+        max-width: 300px;             
     }
 </style>
 <head>
@@ -49,9 +49,9 @@
 
             var min_price = document.getElementById("min_price").value;
             var max_price = document.getElementById("max_price").value;
-            var color = document.getElementById("color").value;
+            
 
-            var url = "filter_shoes.php?min_price=" + min_price + "&max_price=" + max_price + "&color=" + color;
+            var url = "filter_shoes.php?min_price=" + min_price + "&max_price=" + max_price ;
 
             xmlHttp.open("GET", url, true);
             xmlHttp.send();
@@ -60,7 +60,7 @@
         function clearFilters() {
             document.getElementById("min_price").value = '';
             document.getElementById("max_price").value = '';
-            document.getElementById("color").selectedIndex = 0; 
+            
             showAllProducts(); // Show all products again
         }
 
@@ -89,7 +89,7 @@
         function initFilters() {
             document.getElementById("min_price").addEventListener("input", filterShoes);
             document.getElementById("max_price").addEventListener("input", filterShoes);
-            document.getElementById("color").addEventListener("change", filterShoes);
+           
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -121,17 +121,7 @@ include '../../Template/navbar.php';
                 <label for="max_price">Max Price:</label>
                 <input type="number" name="max_price" id="max_price" placeholder="10000" min="0">
 
-                <label for="color">Color:</label>
-                <select name="color" id="color">
-                    <option value="">All Colors</option>
-                    <option value="Red">Red</option>
-                    <option value="Blue">Blue</option>
-                    <option value="Black">Black</option>
-                    <option value="White">White</option>
-                    <option value="Green">Green</option>
-                    <option value="Yellow">Yellow</option>
-                    <option value="Purple">Purple</option>
-                </select>
+                
                 
                 <button type="button" onclick="clearFilters()">Clear Filters</button>
             </form>

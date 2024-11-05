@@ -2,7 +2,7 @@
 include '../../connect.php';
 
 $params = [];
-$query = "SELECT * FROM shoes"; // ใช้ชื่อ 'shoes' ตัวเล็ก
+$query = "SELECT * FROM shoes"; 
 
 // Filter by minimum price
 if (isset($_GET['min_price']) && is_numeric($_GET['min_price'])) {
@@ -26,16 +26,7 @@ if (isset($_GET['max_price']) && is_numeric($_GET['max_price'])) {
     $params[':max_price'] = $max_price;
 }
 
-// Filter by color within stock_data JSON field
-if (isset($_GET['color']) && !empty($_GET['color'])) {
-    $color = $_GET['color'];
-    if (strpos($query, 'WHERE') === false) {
-        $query .= " WHERE JSON_CONTAINS(stock_data, JSON_OBJECT('color', :color), '$')"; 
-    } else {
-        $query .= " AND JSON_CONTAINS(stock_data, JSON_OBJECT('color', :color), '$')"; 
-    }
-    $params[':color'] = $color;
-}
+
 
 $stmt = $pdo->prepare($query);
 

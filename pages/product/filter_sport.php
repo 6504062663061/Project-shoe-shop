@@ -18,12 +18,7 @@ if (isset($_GET['max_price']) && is_numeric($_GET['max_price'])) {
     $params[':max_price'] = $max_price;
 }
 
-// Handle color filter within stock_data JSON field
-if (isset($_GET['color']) && !empty($_GET['color'])) {
-    $color = $_GET['color'];
-    $query .= " AND JSON_CONTAINS(stock_data, JSON_OBJECT('color', :color), '$')"; 
-    $params[':color'] = $color;
-}
+
 
 // Prepare and execute the query
 $stmt = $pdo->prepare($query);

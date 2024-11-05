@@ -35,9 +35,9 @@
 
             var min_price = document.getElementById("min_price").value;
             var max_price = document.getElementById("max_price").value;
-            var color = document.getElementById("color").value;
+            
 
-            var url = "filter_slipper.php?min_price=" + min_price + "&max_price=" + max_price + "&color=" + color;
+            var url = "filter_slipper.php?min_price=" + min_price + "&max_price=" + max_price  ;
 
             xmlHttp.open("GET", url, true);
             xmlHttp.send();
@@ -46,7 +46,7 @@
         function clearFilters() {
             document.getElementById("min_price").value = '';
             document.getElementById("max_price").value = '';
-            document.getElementById("color").selectedIndex = 0; 
+            
             showAllProducts(); 
         }
 
@@ -73,7 +73,7 @@
         function initFilters() {
             document.getElementById("min_price").addEventListener("input", filterShoes);
             document.getElementById("max_price").addEventListener("input", filterShoes);
-            document.getElementById("color").addEventListener("change", filterShoes);
+            
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -105,17 +105,7 @@ include '../../Template/navbar.php';
                 <label for="max_price">Max Price:</label>
                 <input type="number" name="max_price" id="max_price" placeholder="10000" min="0">
 
-                <label for="color">Color:</label>
-                <select name="color" id="color">
-                    <option value="">All Colors</option>
-                    <option value="Red">Red</option>
-                    <option value="Blue">Blue</option>
-                    <option value="Black">Black</option>
-                    <option value="White">White</option>
-                    <option value="Green">Green</option>
-                    <option value="Yellow">Yellow</option>
-                    <option value="Purple">Purple</option>
-                </select>
+                
                 
                 <button type="button" onclick="clearFilters()">Clear Filters</button>
             </form>

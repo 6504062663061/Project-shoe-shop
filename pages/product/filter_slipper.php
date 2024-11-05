@@ -21,14 +21,7 @@ if (isset($_GET['max_price']) && is_numeric($_GET['max_price'])) {
     $params[':max_price'] = $max_price;
 }
 
-// Handle color filter
-if (isset($_GET['color']) && !empty($_GET['color'])) {
-    $color = $_GET['color'];
-    
-    $query .= " AND color = :color"; 
-    
-    $params[':color'] = $color;
-}
+
 
 
 $stmt = $pdo->prepare($query);

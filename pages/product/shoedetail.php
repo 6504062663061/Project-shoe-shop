@@ -1,4 +1,6 @@
-<?php include "../../connect.php"; ?>
+<?php include "../../connect.php";
+        session_start();
+?>
 
 <!DOCTYPE html>
 <html>
@@ -100,7 +102,8 @@
                 <form method="post" action="../cart.php?action=add&Shoes_ID=<?=$row["Shoes_ID"]?>">
                     <input type="hidden" name="pname" value="<?=htmlspecialchars($row["name"])?>">
                     <input type="hidden" name="price" value="<?=htmlspecialchars($row["price"])?>">
-
+                    
+                    <?php if (isset($_SESSION["username"])): ?>
                     <label for="color">Color:</label>
                     <select name="color" id="color" required>
                         <option value="">Select Color</option>
@@ -134,6 +137,9 @@
                 <form method="post" action="../Favorites.php?action=add&Shoes_ID=<?=$row["Shoes_ID"]?>" style="display: inline;">
                     <input class="button is-info" type="submit" value="Add to Favorites">
                 </form>
+                <?php else: ?>
+                    <div style="color:red">กรุณาเข้าสู่ระบบก่อนการสั่งซื้อสินค้า</div>
+                <?php endif; ?>    
             </section>
         </div>
         
